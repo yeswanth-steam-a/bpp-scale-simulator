@@ -1,0 +1,23 @@
+# Run against the existing sandbox chargers (configs/sandbox-chargers.txt) instead of generated ones.
+# Start small: set `chargers` and sessions.total conservatively. See notes in CLAUDE.md before raising.
+target: ws://35.154.56.240:9890/csms/
+ids_file: configs/sandbox-chargers.txt
+chargers: 5
+duration: 30m
+time_scale: 1
+seed: 7
+connect_rate: 2
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 30s
+metrics_addr: ":2112"
+summary_file: "results/sandbox-summary.json"
+sessions:
+  total: 3
+  curve: [1]
+
+idtags:
+  file: configs/sandbox-idtags.txt   # VID:* entries are skipped; validity per tenant is unverified
+noise: {disconnects_per_charger_per_day: 0, faults_per_charger_per_day: 0}
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 5m, session_sigma: 0.2, session_min: 2m, session_max: 10m, session_weight: 1}

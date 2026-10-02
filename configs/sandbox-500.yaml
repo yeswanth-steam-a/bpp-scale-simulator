@@ -1,0 +1,21 @@
+# 500 chargers, ~500 overlapping sessions against the sandbox. Sessions start over 3 min, last ~8 min.
+target: ws://35.154.56.240:9890/csms/
+ids_file: configs/sandbox-chargers.txt
+chargers: 500
+duration: 3m                # session starts are spread over this window
+time_scale: 1
+seed: 11
+connect_rate: 20            # new sockets/sec
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+metrics_addr: ":2112"
+summary_file: "results/sandbox-500.json"
+sessions:
+  total: 500
+  curve: [1]
+idtags:
+  file: configs/sandbox-idtags.txt   # VID:* entries skipped
+noise: {disconnects_per_charger_per_day: 0, faults_per_charger_per_day: 0}
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 8m, session_sigma: 0.05, session_min: 7m, session_max: 9m, session_weight: 1}

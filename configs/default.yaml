@@ -1,0 +1,83 @@
+# Default 24h run: 50k chargers, ~10k sessions, ~2k parallel at peak. Must match the seed: fleet-chargers.sql -v total=50000, customers.sql tags 1..pool.
+target: ws://13.204.91.217:9888/csms/ # chargers connect to <target><charge_point_id>
+chargers: 50000                       # whole fleet, split over shards
+id_prefix: "LT-"                      # ids look like LT-000001
+duration: 24h
+time_scale: 1                         # 144 = play the 24h in 10 minutes (smoke test)
+seed: 42
+connect_rate: 100                     # new sockets/sec per shard during ramp-up
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 30s
+metrics_addr: ":2112"                 # Prometheus text at /metrics, "" to disable
+summary_file: "results/summary.json"  # shard index is appended
+
+sessions:
+  total: 10000
+  # relative start-rate per hour of the run (24 values = hour of day). Tuned so the peak is ~2k parallel.
+  curve: [1, 0.5, 0.3, 0.3, 0.5, 1, 2, 4, 7, 5, 3, 3, 4, 4, 3, 3, 4, 9, 16, 13, 6.5, 3.5, 2, 1.2]
+
+idtags:
+  prefix: "LTTAG"
+  pool: 4000                          # = customers seeded (customers.sql first=1 last=4000); one tag = one session at a time
+  invalid_pct: 0                      # every pool tag is seeded and valid
+
+noise:                                # background disturbances, not spike events
+  disconnects_per_charger_per_day: 0.3
+  faults_per_charger_per_day: 0.1
+  fault_min: 2m
+  fault_max: 20m
+
+profiles:
+  - name: ac-7kw
+    share: 0.45
+    vendor: LoadSim
+    model: AC-7
+    connectors: 1
+    max_power_w: 7400
+    voltage: 230
+    meter_interval: 60s
+    session_mean: 150m
+    session_sigma: 0.5
+    session_min: 15m
+    session_max: 10h
+    session_weight: 0.35
+  - name: ac-22kw
+    share: 0.30
+    vendor: LoadSim
+    model: AC-22
+    connectors: 2
+    max_power_w: 22000
+    voltage: 230
+    meter_interval: 60s
+    session_mean: 80m
+    session_sigma: 0.5
+    session_min: 10m
+    session_max: 8h
+    session_weight: 0.30
+  - name: dc-60kw
+    share: 0.17
+    vendor: LoadSim
+    model: DC-60
+    connectors: 2
+    max_power_w: 60000
+    voltage: 400
+    meter_interval: 30s
+    session_mean: 40m
+    session_sigma: 0.4
+    session_min: 8m
+    session_max: 2h
+    session_weight: 0.22
+  - name: dc-150kw
+    share: 0.08
+    vendor: LoadSim
+    model: DC-150
+    connectors: 2
+    max_power_w: 150000
+    voltage: 600
+    meter_interval: 30s
+    session_mean: 28m
+    session_sigma: 0.35
+    session_min: 8m
+    session_max: 90m
+    session_weight: 0.13

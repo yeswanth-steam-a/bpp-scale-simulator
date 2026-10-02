@@ -1,0 +1,23 @@
+# Staged runs against the new environment. Override size with flags: -chargers N (sessions.total is set to match via -sessions in this file; edit per stage).
+target: ws://13.204.91.217:9888/csms/
+chargers: 5
+id_prefix: "LT-"                 # LT-000001 ...
+duration: 1m                     # session starts are spread over this window
+time_scale: 1
+seed: 5
+connect_rate: 5
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+metrics_addr: ""
+summary_file: "results/newenv-stage5.json"
+sessions:
+  total: 5
+  curve: [1]
+idtags:
+  prefix: "LTTAG"                # LTTAG000001 ...
+  pool: 5
+  invalid_pct: 0
+noise: {disconnects_per_charger_per_day: 0, faults_per_charger_per_day: 0}
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 3m, session_sigma: 0.02, session_min: 170s, session_max: 190s, session_weight: 1}

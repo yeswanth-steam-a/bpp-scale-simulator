@@ -1,0 +1,22 @@
+// Grafana Alloy: scrape the simulator on this host and ship to Grafana Cloud.
+// Env vars (from Grafana Cloud > your stack > Prometheus > "Send metrics"):
+//   GC_PROM_URL   e.g. https://prometheus-prod-XX-prod-XX.grafana.net/api/prom/push
+//   GC_PROM_USER  numeric instance id
+//   GC_API_TOKEN  access policy token with metrics:write scope
+
+prometheus.scrape "loadsim" {
+  targets         = [{"__address__" = "localhost:2112", "instance" = constants.hostname}]
+  scrape_interval = "15s"
+  forward_to      = [prometheus.remote_write.cloud.receiver]
+  job_name        = "loadsim"
+}
+
+prometheus.remote_write "cloud" {
+  endpoint {
+    url = sys.env("GC_PROM_URL")
+    basic_auth {
+      username = sys.env("GC_PROM_USER")
+      password = sys.env("GC_API_TOKEN")
+    }
+  }
+}

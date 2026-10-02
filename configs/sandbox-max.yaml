@@ -1,0 +1,23 @@
+# Saturate the sandbox: every connectable charger runs one session at a time (1 connector each),
+# tags are shared between sessions. Peak parallel sessions = chargers that connect and boot (~487 last time).
+target: ws://35.154.56.240:9890/csms/
+ids_file: configs/sandbox-chargers.txt
+chargers: 0                 # 0 = all ids in the file
+duration: 3m                # session starts spread over this window
+time_scale: 1
+seed: 21
+connect_rate: 20
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+metrics_addr: ":2112"
+summary_file: "results/sandbox-max.json"
+sessions:
+  total: 700                # more than the chargers, so every free charger gets one
+  curve: [1]
+idtags:
+  file: configs/sandbox-idtags.txt
+  shared: true
+noise: {disconnects_per_charger_per_day: 0, faults_per_charger_per_day: 0}
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 10m, session_sigma: 0.05, session_min: 9m, session_max: 11m, session_weight: 1}

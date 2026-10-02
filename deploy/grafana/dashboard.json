@@ -1,0 +1,416 @@
+{
+  "title": "BP Pulse CSMS load test",
+  "uid": "csms-loadtest",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "15s",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Connected chargers",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "sim_connected_chargers",
+          "legendFormat": "connected",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Active charging sessions",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "sim_active_sessions",
+          "legendFormat": "active",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "sim_sessions_planned_total*0 + 2000",
+          "legendFormat": "target peak",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Sessions per minute",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_sessions_started_total[5m])*60",
+          "legendFormat": "started",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_sessions_done_total[5m])*60",
+          "legendFormat": "completed",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_sessions_aborted_total[5m])*60",
+          "legendFormat": "aborted",
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_sessions_skipped_total[5m])*60",
+          "legendFormat": "skipped (no free charger)",
+          "refId": "D"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "Messages per second",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_messages_sent_total[1m])",
+          "legendFormat": "sent",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_messages_received_total[1m])",
+          "legendFormat": "received",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "p95 call latency by action",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "histogram_quantile(0.95, sum by (le,action) (rate(sim_call_latency_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{action}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "timeseries",
+      "title": "p99 call latency by action",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 16,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "histogram_quantile(0.99, sum by (le,action) (rate(sim_call_latency_seconds_bucket[$__rate_interval])))",
+          "legendFormat": "{{action}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "timeseries",
+      "title": "Errors and timeouts per minute",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_call_errors_total[5m])*60",
+          "legendFormat": "CALLERROR",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_call_timeouts_total[5m])*60",
+          "legendFormat": "timeouts",
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_connect_failures_total[5m])*60",
+          "legendFormat": "connect failures",
+          "refId": "C"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "timeseries",
+      "title": "Disconnects per minute (injected vs total)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 24,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_disconnects_total[5m])*60",
+          "legendFormat": "all disconnects",
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_injected_drops_total[5m])*60",
+          "legendFormat": "injected drops",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "Offline queue (messages buffered while disconnected)",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "rate(sim_queued_offline_total[5m])*60",
+          "legendFormat": "queued per min",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "Call outcomes",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS}"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 32,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS}"
+          },
+          "expr": "sum by (action,outcome) (rate(sim_call_outcomes_total{outcome!=\"ok\"}[5m]))*60",
+          "legendFormat": "{{action}} {{outcome}}",
+          "refId": "A"
+        }
+      ]
+    }
+  ],
+  "templating": {
+    "list": [
+      {
+        "name": "DS",
+        "label": "Data source",
+        "type": "datasource",
+        "query": "prometheus"
+      }
+    ]
+  }
+}
