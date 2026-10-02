@@ -3,6 +3,7 @@ build:
 	go build -o bin/simulator ./cmd/simulator
 	go build -o bin/seedgen ./cmd/seedgen
 	go build -o bin/mockcsms ./cmd/mockcsms
+	go build -o bin/probe ./cmd/probe
 test:
 	go vet ./... && go test ./...
 plan:
