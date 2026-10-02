@@ -2,3 +2,4 @@ bin/
 results/
 seed/
 .env.seed
+exports/

@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"syscall"
 	"time"
 
@@ -84,7 +85,11 @@ func main() {
 
 	log.Println("run finished:", m.Line())
 	if cfg.SummaryFile != "" {
-		out, err := os.Create(fmt.Sprintf("%s.shard%d", cfg.SummaryFile, *shardIdx))
+		path := fmt.Sprintf("%s.shard%d", cfg.SummaryFile, *shardIdx)
+		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil { // results/ is git-ignored, so absent on a fresh clone
+			log.Fatal(err)
+		}
+		out, err := os.Create(path)
 		if err != nil {
 			log.Fatal(err)
 		}

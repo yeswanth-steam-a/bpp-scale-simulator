@@ -73,6 +73,24 @@ Override settings without editing a file:
 ./bin/simulator -config configs/newenv-stage50.yaml -target ws://other-host:9888/csms/ -chargers 20 -duration 2m
 ```
 
+### Realistic ramp (recommended capacity test)
+
+`configs/ramp-realistic.yaml` behaves like a real network: **5,000 chargers connect once and stay connected**
+(heartbeats every 30 s, status reports, random disconnects and connector faults), while the number of
+charging sessions steps up inside the same run: about 100, 250, 500, 750 and 1,000 in parallel, 6 minutes per step.
+Most chargers are idle at any time, as in a real network.
+
+```bash
+mkdir -p results
+ulimit -n 200000
+./bin/simulator -config configs/ramp-realistic.yaml -plan   # check: 5,200 sessions, peak about 1,000
+./bin/simulator -config configs/ramp-realistic.yaml         # about 35 minutes
+```
+The progress line every 10 seconds shows the step you are in (`sessions=`) and any trouble (`timeouts=`,
+`callerr=`). The target needs chargers `LT-000001` to `LT-005000` and tags `LTTAG000001` to `LTTAG004000`.
+Clear old run data before each run (`seed/reset-runs.sql`, run from a machine with database access), or
+sessions left open by an earlier run block their connectors.
+
 ### The full run (24 hours)
 
 `configs/default.yaml`: 50,000 chargers, 10,000 sessions over 24 hours, about 2,000 in parallel at the peak,
