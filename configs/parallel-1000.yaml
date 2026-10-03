@@ -1,0 +1,39 @@
+# 1,000 real parallel sessions (low churn): 3,000 chargers (real type mix: AC 7/22 kW, DC 60/150 kW) stay connected;
+# sessions of ~45 minutes start at a steady ~22/min for 75 minutes, so parallel sessions climb to ~1,000 by minute 45
+# and hold there for ~30 minutes, then the last ones finish. MeterValues every 60 s (AC) / 30 s (DC) throughout.
+# Total ~2 h 10 min: 2.5 min connect, 5 min idle, 75 min of starts, up to 60 min for the last sessions to finish.
+# Needs: LT-000001..LT-003000, tags LTTAG000001..LTTAG010000. Run from inside AWS.
+target: ws://bp-sim.iris-cms.com:9888/csms/
+chargers: 3000
+id_prefix: "LT-"
+duration: 75m
+time_scale: 1
+seed: 1000
+connect_rate: 20
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+warmup: 5m
+metrics_addr: ":2112"
+summary_file: "results/parallel-1000.json"
+
+sessions:
+  total: 1670                 # ~22 starts/min x 75 min; with ~45 min sessions this holds ~1,000 in parallel
+  curve: [1]                  # flat: same start rate for the whole 75 minutes
+
+idtags:
+  prefix: "LTTAG"
+  pool: 10000
+  invalid_pct: 0
+
+noise:
+  disconnects_per_charger_per_day: 0.3
+  faults_per_charger_per_day: 0.1
+  fault_min: 2m
+  fault_max: 20m
+
+profiles:
+  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 1, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 45m, session_sigma: 0.15, session_min: 30m, session_max: 60m, session_weight: 1}
+  - {name: ac-22kw,  share: 0.30, vendor: LoadSim, model: AC-22,  connectors: 2, max_power_w: 22000,  voltage: 230, meter_interval: 60s, session_mean: 45m, session_sigma: 0.15, session_min: 30m, session_max: 60m, session_weight: 1}
+  - {name: dc-60kw,  share: 0.17, vendor: LoadSim, model: DC-60,  connectors: 2, max_power_w: 60000,  voltage: 400, meter_interval: 30s, session_mean: 45m, session_sigma: 0.15, session_min: 30m, session_max: 60m, session_weight: 1}
+  - {name: dc-150kw, share: 0.08, vendor: LoadSim, model: DC-150, connectors: 2, max_power_w: 150000, voltage: 600, meter_interval: 30s, session_mean: 45m, session_sigma: 0.15, session_min: 30m, session_max: 60m, session_weight: 1}
