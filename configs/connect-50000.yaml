@@ -1,0 +1,87 @@
+# Peak-connection test: all 50,000 chargers (77,500 connectors, same type mix as the seed) connect at 200/s (~4 min),
+# then stay up 30 minutes with no charging sessions: 30 s heartbeats, StatusNotification per connector on boot,
+# and real-world noise (random disconnect/reconnects and connector faults, which send Faulted -> Available).
+# Needs: LT-000001..LT-050000 in the target. One load generator: raise ulimit -n and widen the source port range first
+# (see README). Run from inside AWS, not behind a home router.
+target: ws://bp-sim.iris-cms.com:9888/csms/
+chargers: 50000
+id_prefix: "LT-"
+duration: 1m                  # no sessions: the run is the 30-minute warm-up hold
+time_scale: 1
+seed: 50000
+connect_rate: 200            # 50,000 chargers in ~4 min
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+warmup: 30m                   # all chargers online, heartbeats and status only
+metrics_addr: ":2112"
+summary_file: "results/connect-50000.json"
+
+sessions:
+  total: 0
+  curve: [1]
+
+idtags:
+  prefix: "LTTAG"
+  pool: 10000
+  invalid_pct: 0
+
+noise:                                # background disturbances, not spike events
+  disconnects_per_charger_per_day: 0.3
+  faults_per_charger_per_day: 0.1
+  fault_min: 2m
+  fault_max: 20m
+
+profiles:
+  - name: ac-7kw
+    share: 0.45
+    vendor: LoadSim
+    model: AC-7
+    connectors: 1
+    max_power_w: 7400
+    voltage: 230
+    meter_interval: 60s
+    session_mean: 150m
+    session_sigma: 0.5
+    session_min: 15m
+    session_max: 10h
+    session_weight: 0.35
+  - name: ac-22kw
+    share: 0.30
+    vendor: LoadSim
+    model: AC-22
+    connectors: 2
+    max_power_w: 22000
+    voltage: 230
+    meter_interval: 60s
+    session_mean: 80m
+    session_sigma: 0.5
+    session_min: 10m
+    session_max: 8h
+    session_weight: 0.30
+  - name: dc-60kw
+    share: 0.17
+    vendor: LoadSim
+    model: DC-60
+    connectors: 2
+    max_power_w: 60000
+    voltage: 400
+    meter_interval: 30s
+    session_mean: 40m
+    session_sigma: 0.4
+    session_min: 8m
+    session_max: 2h
+    session_weight: 0.22
+  - name: dc-150kw
+    share: 0.08
+    vendor: LoadSim
+    model: DC-150
+    connectors: 2
+    max_power_w: 150000
+    voltage: 600
+    meter_interval: 30s
+    session_mean: 28m
+    session_sigma: 0.35
+    session_min: 8m
+    session_max: 90m
+    session_weight: 0.13
