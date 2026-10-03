@@ -2,9 +2,11 @@
 # sessions of ~45 minutes start at a steady ~22/min for 75 minutes, so parallel sessions climb to ~1,000 by minute 45
 # and hold there for ~30 minutes, then the last ones finish. MeterValues every 60 s (AC) / 30 s (DC) throughout.
 # Total ~2 h 10 min: 2.5 min connect, 5 min idle, 75 min of starts, up to 60 min for the last sessions to finish.
-# Needs: LT-000001..LT-003000, tags LTTAG000001..LTTAG010000. Run from inside AWS.
+# Chargers come from configs/mix-3000-ids.txt: real seeded IDs of each type, listed in the same order and shares as the profiles
+# (the seed lays types out in blocks: AC-7 1..22500, AC-22 22501..37500, DC-60 37501..46000, DC-150 46001..50000). Tags LTTAG000001..LTTAG010000. Run from inside AWS.
 target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 3000
+ids_file: "configs/mix-3000-ids.txt"   # 1,350 AC 7 kW + 900 AC 22 kW + 510 DC 60 kW + 240 DC 150 kW, in profile order
 id_prefix: "LT-"
 duration: 75m
 time_scale: 1
