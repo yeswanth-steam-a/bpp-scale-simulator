@@ -1,0 +1,36 @@
+# Stepped session ramp on 10,000 connected chargers: 3,000 -> 4,000 -> 5,000 -> 6,000 parallel sessions, 6 minutes per step (finds the ceiling).
+# Chargers connect at 20/s (~8.5 min), idle 5 minutes (heartbeats only), then sessions start. Sessions last about 3 minutes.
+# Background disconnects/reconnects and connector faults are on. Run from inside AWS (not behind a home router).
+# Needs in the target: chargers LT-000001..LT-010000 and tags LTTAG000001..LTTAG010000 (a tag serves one session at a time).
+target: ws://bp-sim.iris-cms.com:9888/csms/
+chargers: 10000
+id_prefix: "LT-"
+duration: 24m                 # 4 steps x 6 min
+time_scale: 1
+seed: 6000
+connect_rate: 20             # 10,000 chargers connect in ~8.5 min
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+warmup: 5m                    # all chargers online and idle (heartbeats only) for 5 minutes before sessions start
+metrics_addr: ":2112"
+summary_file: "results/ramp-10000-6000.json"
+
+sessions:
+  # sessions per step = parallel target x (6 min / 3 min): 6000 + 8000 + 10000 + 12000
+  total: 36000
+  curve: [3000, 4000, 5000, 6000]   # one slot per step: start rate proportional to the parallel target
+
+idtags:
+  prefix: "LTTAG"
+  pool: 10000                 # well above the ~6,100 peak, so a tag is almost always free
+  invalid_pct: 0
+
+noise:
+  disconnects_per_charger_per_day: 0.3
+  faults_per_charger_per_day: 0.1
+  fault_min: 2m
+  fault_max: 20m
+
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 3m, session_sigma: 0.1, session_min: 2m, session_max: 4m, session_weight: 1}
