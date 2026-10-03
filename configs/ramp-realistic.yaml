@@ -3,7 +3,7 @@
 # Each step holds 6 minutes; sessions last about 3 minutes, so each step reaches a steady plateau.
 # Background disconnects/reconnects and connector faults are on, at the same per-charger rates as default.yaml.
 # Needs in the target: chargers LT-000001..LT-005000 (all AC 7 kW, one connector) and tags LTTAG000001..LTTAG004000.
-target: ws://13.204.91.217:9888/csms/
+target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 5000
 id_prefix: "LT-"
 duration: 30m                 # 5 steps x 6 min

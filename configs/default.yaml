@@ -1,5 +1,5 @@
 # Default 24h run: 50k chargers, ~10k sessions, ~2k parallel at peak. Must match the seed: fleet-chargers.sql -v total=50000, customers.sql tags 1..pool.
-target: ws://13.204.91.217:9888/csms/ # chargers connect to <target><charge_point_id>
+target: ws://bp-sim.iris-cms.com:9888/csms/ # chargers connect to <target><charge_point_id>
 chargers: 50000                       # whole fleet, split over shards
 id_prefix: "LT-"                      # ids look like LT-000001
 duration: 24h

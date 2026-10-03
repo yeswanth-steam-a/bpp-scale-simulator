@@ -1,5 +1,5 @@
 # Staged runs against the new environment. Override size with flags: -chargers N (sessions.total is set to match via -sessions in this file; edit per stage).
-target: ws://13.204.91.217:9888/csms/
+target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 1000
 id_prefix: "LT-"                 # LT-000001 ...
 duration: 1m                     # session starts are spread over this window

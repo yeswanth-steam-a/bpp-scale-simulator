@@ -25,7 +25,7 @@ type result struct {
 }
 
 func main() {
-	target := flag.String("target", "ws://35.154.56.240:9890/csms/", "CSMS base url ending in /csms/")
+	target := flag.String("target", "ws://bp-sim.iris-cms.com:9888/csms/", "CSMS base url ending in /csms/")
 	ids := flag.String("id", "T1", "comma-separated charge point ids (one session each, run concurrently)")
 	tag := flag.String("tag", "", "idTag; if set, runs one short session per charger")
 	connector := flag.Int("connector", 1, "connector id for the session")
