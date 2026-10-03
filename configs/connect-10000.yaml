@@ -1,7 +1,6 @@
 # Idle connect test: 10,000 chargers (LT-000001..LT-010000) connect at 20/s, then idle 5 minutes
 # (heartbeats and status only, one token session at the end). Finds the connected-charger ceiling.
 # Run it from inside AWS: a home or office router's connection table can cap out first.
-target: chargers LT-000001..LT-005000 (all AC 7 kW, one connector) and tags LTTAG000001..LTTAG004000.
 target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 10000
 id_prefix: "LT-"
