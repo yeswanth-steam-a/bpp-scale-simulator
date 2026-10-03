@@ -13,6 +13,7 @@ connect_rate: 50              # 5,000 chargers connect in ~100 s, then the sessi
 reconnect_min: 2s
 reconnect_max: 60s
 call_timeout: 60s
+warmup: 5m                    # all chargers online and idle (heartbeats only) for 5 minutes before sessions start
 metrics_addr: ":2112"
 summary_file: "results/ramp-500.json"
 

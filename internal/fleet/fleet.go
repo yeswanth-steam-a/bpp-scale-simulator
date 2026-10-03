@@ -94,6 +94,18 @@ func (f *Fleet) Run(ctx context.Context) {
 		return
 	}
 
+	if w := time.Duration(float64(f.cfg.Warmup) / f.cfg.TimeScale); w > 0 {
+		log.Printf("warm-up: %d chargers connected, idling (heartbeats and status only) for %s before the first session",
+			f.m.Connected.Load(), f.cfg.Warmup)
+		select {
+		case <-time.After(w):
+		case <-ctx.Done():
+			stop()
+			wg.Wait()
+			return
+		}
+	}
+
 	plan := Shard(BuildPlan(f.cfg), f.shard, f.shards)
 	f.m.SessionsPlanned.Store(int64(len(plan)))
 	log.Printf("ramp complete: %d/%d chargers connected; playing %d sessions over %s (time scale x%g)",

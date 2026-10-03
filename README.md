@@ -78,7 +78,9 @@ Override settings without editing a file:
 `configs/ramp-realistic.yaml` behaves like a real network: **5,000 chargers connect once and stay connected**
 (heartbeats every 30 s, status reports, random disconnects and connector faults), while the number of
 charging sessions steps up inside the same run: about 100, 250, 500, 750 and 1,000 in parallel, 6 minutes per step.
-Most chargers are idle at any time, as in a real network.
+Most chargers are idle at any time, as in a real network. The run first waits for the chargers to connect, then
+idles for `warmup` (5 minutes: heartbeats and status only) before the first session, so the idle-network load
+is measured on its own first.
 
 ```bash
 mkdir -p results
@@ -162,6 +164,7 @@ All settings are in one YAML file (see `configs/default.yaml` for a commented ex
 | `seed` | makes the session plan reproducible |
 | `connect_rate` | new connections per second during ramp-up, per shard (`50` connects 1,000 chargers in 20 s) |
 | `call_timeout` | a call with no reply after this long counts as a timeout |
+| `warmup` | after the chargers connect, stay idle (heartbeats and status only) this long before the first session |
 | `sessions.total`, `sessions.curve` | sessions over the run, and relative start rate per slot (24 values = hours of the day) |
 | `idtags.prefix`, `idtags.pool` | tags are `<prefix>` + 6 digits; `pool` is how many exist. A tag serves one session at a time |
 | `idtags.list` / `idtags.file` | optional: use exactly these existing tags (`VID:` entries skipped) |

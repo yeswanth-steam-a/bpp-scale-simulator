@@ -26,6 +26,7 @@ type Config struct {
 	ReconnectMin time.Duration `yaml:"reconnect_min"` // backoff bounds for dropped chargers
 	ReconnectMax time.Duration `yaml:"reconnect_max"`
 	CallTimeout  time.Duration `yaml:"call_timeout"` // no CALLRESULT within this => counted as timeout
+	Warmup       time.Duration `yaml:"warmup"`       // after the chargers are connected, idle (heartbeats only) this long before the first session
 	MetricsAddr  string        `yaml:"metrics_addr"` // "" disables the HTTP endpoint
 	SummaryFile  string        `yaml:"summary_file"` // JSON summary written at the end
 	Sessions     Sessions      `yaml:"sessions"`
