@@ -1,11 +1,11 @@
-# Stepped session ramp on 10,000 connected chargers: 250 -> 500 -> 1,000 -> 2,000 parallel sessions, 6 minutes per step.
+# Stepped session ramp on 10,000 connected chargers: 250 -> 500 -> 1,000 -> 2,000 -> 3,000 parallel sessions (finds the peak the stack can hold), 6 minutes per step.
 # Chargers connect at 20/s (~8.5 min), idle 5 minutes (heartbeats only), then sessions start. Sessions last about 3 minutes.
 # Background disconnects/reconnects and connector faults are on. Run from inside AWS (not behind a home router).
 # Needs in the target: chargers LT-000001..LT-010000 and tags LTTAG000001..LTTAG004000 (a tag serves one session at a time).
 target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 10000
 id_prefix: "LT-"
-duration: 24m                 # 4 steps x 6 min
+duration: 30m                 # 5 steps x 6 min
 time_scale: 1
 seed: 10000
 connect_rate: 20             # 10,000 chargers connect in ~8.5 min
@@ -14,16 +14,16 @@ reconnect_max: 60s
 call_timeout: 60s
 warmup: 5m                    # all chargers online and idle (heartbeats only) for 5 minutes before sessions start
 metrics_addr: ":2112"
-summary_file: "results/ramp-10000-2000.json"
+summary_file: "results/ramp-10000-3000.json"
 
 sessions:
-  # sessions per step = parallel target x (6 min / 3 min): 500 + 1000 + 2000 + 4000
-  total: 7500
-  curve: [250, 500, 1000, 2000]   # one slot per step: start rate proportional to the parallel target
+  # sessions per step = parallel target x (6 min / 3 min): 500 + 1000 + 2000 + 4000 + 6000
+  total: 13500
+  curve: [250, 500, 1000, 2000, 3000]   # one slot per step: start rate proportional to the parallel target
 
 idtags:
   prefix: "LTTAG"
-  pool: 4000                  # twice the 2,000 peak, so a tag is always free
+  pool: 4000                  # above the ~3,100 peak, so a tag is almost always free
   invalid_pct: 0
 
 noise:
