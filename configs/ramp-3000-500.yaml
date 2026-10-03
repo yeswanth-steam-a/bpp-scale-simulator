@@ -1,0 +1,37 @@
+# Realistic stepped ramp to 500 in ONE run: 3,000 chargers stay connected for the whole test (heartbeats every 30 s,
+# status reports), while parallel charging sessions step up 100 -> 250 -> 500.
+# Each step holds 6 minutes; sessions last about 3 minutes, so each step reaches a steady plateau.
+# Background disconnects/reconnects and connector faults are on, at the same per-charger rates as default.yaml.
+# Needs in the target: chargers LT-000001..LT-003000 (all AC 7 kW, one connector) and tags LTTAG000001..LTTAG004000.
+target: ws://13.204.91.217:9888/csms/
+chargers: 3000
+id_prefix: "LT-"
+duration: 18m                 # 3 steps x 6 min
+time_scale: 1
+seed: 3000
+connect_rate: 20             # 3,000 chargers connect in ~150 s
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+warmup: 5m                    # all chargers online and idle (heartbeats only) for 5 minutes before sessions start
+metrics_addr: ":2112"
+summary_file: "results/ramp-3000-500.json"
+
+sessions:
+  # sessions per step = parallel target x (6 min / 3 min): 200 + 500 + 1000
+  total: 1700
+  curve: [100, 250, 500]        # one slot per step: start rate proportional to the parallel target
+
+idtags:
+  prefix: "LTTAG"
+  pool: 4000                  # more than the 1,000 peak, so a tag is always free
+  invalid_pct: 0
+
+noise:
+  disconnects_per_charger_per_day: 0.3
+  faults_per_charger_per_day: 0.1
+  fault_min: 2m
+  fault_max: 20m
+
+profiles:
+  - {name: ac-7kw, share: 1, vendor: LoadSim, model: AC-7, connectors: 1, max_power_w: 7400, voltage: 230, meter_interval: 30s, session_mean: 3m, session_sigma: 0.1, session_min: 2m, session_max: 4m, session_weight: 1}
