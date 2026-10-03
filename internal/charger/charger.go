@@ -7,10 +7,14 @@ package charger
 
 import (
 	"context"
+	"log"
 	"math"
 	"math/rand"
 	"net/http"
+	"regexp"
 	"strconv"
+	"strings"
+	"sync"
 	"sync/atomic"
 	"time"
 
@@ -21,6 +25,24 @@ import (
 	"github.com/steam-a/bpp-load-simulator/internal/metrics"
 	"github.com/steam-a/bpp-load-simulator/internal/ocpp"
 )
+
+// connectErrs counts connect failures by kind; the first of each kind and every 1,000th after it are logged,
+// so a run that hits a connection limit says why (refused, timeout, HTTP status) without flooding the log.
+var connectErrs sync.Map // kind -> *atomic.Int64
+
+var digits = regexp.MustCompile(`[0-9]+`)
+
+func logConnectError(id string, err error, resp *http.Response) {
+	msg := err.Error()
+	if resp != nil {
+		msg += " (HTTP " + strconv.Itoa(resp.StatusCode) + ")"
+	}
+	kind := digits.ReplaceAllString(strings.ReplaceAll(msg, id, "<id>"), "N")
+	v, _ := connectErrs.LoadOrStore(kind, new(atomic.Int64))
+	if n := v.(*atomic.Int64).Add(1); n == 1 || n%1000 == 0 {
+		log.Printf("connect error #%d of this kind, e.g. %s: %s", n, id, msg)
+	}
+}
 
 type CmdKind int
 
@@ -173,9 +195,10 @@ func (c *Charger) Run(ctx context.Context) {
 			ReadBufferSize:   1024,
 			WriteBufferSize:  1024,
 		}
-		conn, _, err := d.DialContext(ctx, c.cfg.Target+c.ID, http.Header{})
+		conn, resp, err := d.DialContext(ctx, c.cfg.Target+c.ID, http.Header{})
 		if err != nil {
 			c.m.ConnectFailures.Add(1)
+			logConnectError(c.ID, err, resp)
 			c.idle(c.jitter(backoff/2, backoff))
 			if backoff *= 2; backoff > c.cfg.ReconnectMax {
 				backoff = c.cfg.ReconnectMax
