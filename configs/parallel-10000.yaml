@@ -36,7 +36,7 @@ noise:
   fault_max: 20m
 
 profiles:
-  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 1, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 30m, session_sigma: 0.15, session_min: 20m, session_max: 40m, session_weight: 1}
+  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 2, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 30m, session_sigma: 0.15, session_min: 20m, session_max: 40m, session_weight: 1}
   - {name: ac-22kw,  share: 0.30, vendor: LoadSim, model: AC-22,  connectors: 2, max_power_w: 22000,  voltage: 230, meter_interval: 60s, session_mean: 30m, session_sigma: 0.15, session_min: 20m, session_max: 40m, session_weight: 1}
   - {name: dc-60kw,  share: 0.17, vendor: LoadSim, model: DC-60,  connectors: 2, max_power_w: 60000,  voltage: 400, meter_interval: 30s, session_mean: 30m, session_sigma: 0.15, session_min: 20m, session_max: 40m, session_weight: 1}
   - {name: dc-150kw, share: 0.08, vendor: LoadSim, model: DC-150, connectors: 2, max_power_w: 150000, voltage: 600, meter_interval: 30s, session_mean: 30m, session_sigma: 0.15, session_min: 20m, session_max: 40m, session_weight: 1}

@@ -1,4 +1,4 @@
-# Milestone retry (~60 min): 50,000 connected chargers (77,500 connectors), sessions stepping 10,000 -> 15,000 -> 22,000.
+# Milestone retry (~60 min): 50,000 connected chargers (100,000 connectors), sessions stepping 10,000 -> 15,000 -> 22,000.
 # ~10-minute sessions; start rates 1,000 / 1,500 / 2,200 per minute (up to ~37 starts/s plus as many stops).
 # Steps are 12 / 12 / 20 minutes (4-minute curve slots); parallel reaches each level ~10 min into its step, so 22,000
 # holds for ~10 min at the end. Chargers connect at 200/s (~4 min), then 2 minutes idle. Sessions spread evenly over the
@@ -33,7 +33,7 @@ noise:
   fault_max: 20m
 
 profiles:
-  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 1, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 10m, session_sigma: 0.15, session_min: 7m, session_max: 13m, session_weight: 1}
+  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 2, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 10m, session_sigma: 0.15, session_min: 7m, session_max: 13m, session_weight: 1}
   - {name: ac-22kw,  share: 0.30, vendor: LoadSim, model: AC-22,  connectors: 2, max_power_w: 22000,  voltage: 230, meter_interval: 60s, session_mean: 10m, session_sigma: 0.15, session_min: 7m, session_max: 13m, session_weight: 1}
   - {name: dc-60kw,  share: 0.17, vendor: LoadSim, model: DC-60,  connectors: 2, max_power_w: 60000,  voltage: 400, meter_interval: 30s, session_mean: 10m, session_sigma: 0.15, session_min: 7m, session_max: 13m, session_weight: 1}
   - {name: dc-150kw, share: 0.08, vendor: LoadSim, model: DC-150, connectors: 2, max_power_w: 150000, voltage: 600, meter_interval: 30s, session_mean: 10m, session_sigma: 0.15, session_min: 7m, session_max: 13m, session_weight: 1}

@@ -142,7 +142,7 @@ the backend actually created, and check that none are left open.
 | Thing | Requirement |
 |---|---|
 | Chargers | one row per charger id (`LT-000001`...) registered with the backend and the OCPP server, status Active. An unknown id is refused with HTTP 404 at the WebSocket handshake |
-| Charger types | the simulator profiles (connector count, power) should match the seeded chargers; `configs/default.yaml` uses 45% AC 7 kW (1 connector), 30% AC 22 kW, 17% DC 60 kW, 8% DC 150 kW (2 connectors each). The staged configs use AC 7 kW only |
+| Charger types | the simulator profiles (connector count, power) should match the seeded chargers; `configs/default.yaml` uses 45% AC 7 kW, 30% AC 22 kW, 17% DC 60 kW, 8% DC 150 kW, all with 2 connectors (50,000 chargers, 100,000 connectors in the current seed). The staged configs use AC 7 kW only |
 | Customers | one per tag (`LTTAG000001`...), tag type **`rfid`**, active, not expired, a wallet balance, a default vehicle |
 | Tag type | `remote_id` tags are accepted by the OCPP server but create no backend session, so they test nothing |
 

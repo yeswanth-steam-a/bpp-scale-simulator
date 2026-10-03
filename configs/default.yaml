@@ -33,7 +33,7 @@ profiles:
     share: 0.45
     vendor: LoadSim
     model: AC-7
-    connectors: 1
+    connectors: 2
     max_power_w: 7400
     voltage: 230
     meter_interval: 60s

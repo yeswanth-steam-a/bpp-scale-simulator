@@ -1,4 +1,4 @@
-# Peak-connection test: all 50,000 chargers (77,500 connectors, same type mix as the seed) connect at 200/s (~4 min),
+# Peak-connection test: all 50,000 chargers (100,000 connectors: 2 each, same type mix as the seed) connect at 200/s (~4 min),
 # then stay up 30 minutes with no charging sessions: 30 s heartbeats, StatusNotification per connector on boot,
 # and real-world noise (random disconnect/reconnects and connector faults, which send Faulted -> Available).
 # Needs: LT-000001..LT-050000 in the target. One load generator: raise ulimit -n and widen the source port range first
@@ -37,7 +37,7 @@ profiles:
     share: 0.45
     vendor: LoadSim
     model: AC-7
-    connectors: 1
+    connectors: 2
     max_power_w: 7400
     voltage: 230
     meter_interval: 60s
