@@ -8,6 +8,7 @@
 #   GUARD_CONSEC=6 GUARD_CONN_CONSEC=60 scripts/guarded-run.sh CONFIG 50 100   (1 min of errors / 10 min disconnected)
 #
 # Usage (repo root, after `make build`): scripts/guarded-run.sh CONFIG [MAX_TIMEOUTS=10] [MAX_AUTH_REJ=20]
+# TARGET=ws://HOST:PORT/csms/ overrides the config's target (e.g. when DNS is stale).
 # Log: results/<config name>-<HHMM>.log
 set -uo pipefail
 CFG=${1:?usage: scripts/guarded-run.sh CONFIG [MAX_TIMEOUTS] [MAX_AUTH_REJ]}
@@ -16,7 +17,7 @@ NERR=${GUARD_CONSEC:-1}; NCONN=${GUARD_CONN_CONSEC:-1}
 LOG=results/$(basename "$CFG" .yaml)-$(date +%H%M).log
 mkdir -p results
 
-./bin/simulator -config "$CFG" > "$LOG" 2>&1 &
+./bin/simulator -config "$CFG" ${TARGET:+-target "$TARGET"} > "$LOG" 2>&1 &
 PID=$!
 echo "simulator pid $PID, log $LOG (guard: >$MAXT timeouts or >$MAXA auth rejections per 10 s for $NERR line(s);" \
      "connected <98% of peak for $NCONN line(s))"
