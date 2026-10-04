@@ -3,7 +3,8 @@
 # Each curve value is the start rate (sessions per minute) for one 30-minute slot (24 slots over 12 h). The peak rate
 # (667/min = 11.1/s) equals the rate milestone-50k-20k sustained on 2026-10-04. Parallel ~= rate x mean session
 # length (~52 min: AC ~60 min, DC ~30 min, by fleet share). Background disconnects/faults at realistic levels.
-# Needs: 45,000 tags, hourly DB cleanup (Slot-Clear-Cron-Dev) disabled, OCPP restarted just before, enough RDS storage.
+# Needs: 45,000 tags, hourly DB cleanup (Slot-Clear-Cron-Dev) disabled, OCPP restarted just before, enough RDS storage,
+# and (until the OCPP update-throttling fix) one planned OCPP restart ~5.5 h in, at the night trough, to clear its backlog.
 # Run on the simulator EC2: GUARD_CONSEC=6 GUARD_CONN_CONSEC=60 scripts/guarded-run.sh configs/overnight-50k.yaml 50 100
 target: ws://bp-sim.iris-cms.com:9888/csms/
 chargers: 50000
@@ -13,7 +14,7 @@ time_scale: 1
 seed: 21009
 connect_rate: 200            # 50,000 chargers in ~4 min (proven: 0 failures)
 reconnect_min: 2s
-reconnect_max: 60s
+reconnect_max: 300s            # after the planned mid-run OCPP restart, 50k chargers reconnect over ~5 min (~170/s)
 call_timeout: 10s
 warmup: 2m
 metrics_addr: ":2112"
