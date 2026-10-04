@@ -1,0 +1,36 @@
+# Session-rate capacity probe, small enough to run from a laptop (3,000 chargers / 6,000 connectors, under home-router NAT limits).
+# Measures how many session starts per second the stack sustains (the network service on one EC2 choked at ~17/s on 2026-10-04).
+# Starts step up every 4 minutes: 2, 4, 6, 8, 12, 16 per second; 3-minute sessions, so stops follow at the same rate
+# and parallel sessions peak near 16 x 180 = ~2,900. Total ~30 min: 2.5 min connect, 1 min idle, 24 min of steps, ~3.5 min drain.
+# Run with a guard that kills the simulator if BFF Lambda concurrency passes ~250 (account limit is shared with production).
+target: ws://bp-sim.iris-cms.com:9888/csms/
+chargers: 3000
+ids_file: "configs/mix-3000-ids.txt"   # 1,350 AC 7 kW + 900 AC 22 kW + 510 DC 60 kW + 240 DC 150 kW, in profile order
+id_prefix: "LT-"
+duration: 24m
+time_scale: 1
+seed: 3000
+connect_rate: 20
+reconnect_min: 2s
+reconnect_max: 60s
+call_timeout: 60s
+warmup: 1m
+metrics_addr: ""
+summary_file: "results/rate-steps-3000.json"
+
+sessions:
+  total: 11520                # 6 slots x 4 min; weight 2 = 480 starts per slot = 2/s
+  curve: [2, 4, 6, 8, 12, 16]
+
+idtags:
+  prefix: "LTTAG"
+  pool: 30000
+  invalid_pct: 0
+
+noise: {disconnects_per_charger_per_day: 0, faults_per_charger_per_day: 0}
+
+profiles:
+  - {name: ac-7kw,   share: 0.45, vendor: LoadSim, model: AC-7,   connectors: 2, max_power_w: 7400,   voltage: 230, meter_interval: 60s, session_mean: 3m, session_sigma: 0.05, session_min: 150s, session_max: 210s, session_weight: 1}
+  - {name: ac-22kw,  share: 0.30, vendor: LoadSim, model: AC-22,  connectors: 2, max_power_w: 22000,  voltage: 230, meter_interval: 60s, session_mean: 3m, session_sigma: 0.05, session_min: 150s, session_max: 210s, session_weight: 1}
+  - {name: dc-60kw,  share: 0.17, vendor: LoadSim, model: DC-60,  connectors: 2, max_power_w: 60000,  voltage: 400, meter_interval: 30s, session_mean: 3m, session_sigma: 0.05, session_min: 150s, session_max: 210s, session_weight: 1}
+  - {name: dc-150kw, share: 0.08, vendor: LoadSim, model: DC-150, connectors: 2, max_power_w: 150000, voltage: 600, meter_interval: 30s, session_mean: 3m, session_sigma: 0.05, session_min: 150s, session_max: 210s, session_weight: 1}
