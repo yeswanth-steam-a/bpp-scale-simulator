@@ -25,6 +25,8 @@ Load simulator for the EV CSMS (sibling repos `../saevocpp` OCPP 1.6J server, `.
 - `go run ./cmd/seedgen -out seed -tenant <t>` writes `seed/seed.sql` and `seed/teardown.sql`
 - Real run: `./bin/simulator -config configs/default.yaml -target ws://HOST:9898/csms/`; shard across hosts with `-shard-index i -shard-count n`
 - Raise `ulimit -n` (>= 100000) on the load generator before a 40k run
+- `scripts/guarded-run.sh CONFIG` runs the simulator and stops it when timeouts/Authorize rejections spike (protects the account-wide Lambda limit shared with production); `GUARD_CONSEC`/`GUARD_CONN_CONSEC` make it tolerant for long soaks
+- `scripts/log-truncate.sh [THRESHOLD_MB] [INTERVAL_S]` keeps the OCPP server's `saev_ocpp_log` (two rows per charger message, ~1.6 GB per 10 min at 30k parallel) from filling the shared RDS: saves response-time medians, then TRUNCATEs above the threshold. Run it inside AWS (simulator EC2, `LOG_DB_URL` pointing at the RDS proxy) for anything longer than a supervised test
 
 ## Architecture
 
